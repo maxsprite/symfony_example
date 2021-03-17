@@ -1,0 +1,106 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+        App\Entity\AdminUser:
+            algorithm: auto
+
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+        app_admin_user_provider:
+            entity:
+                class: App\Entity\AdminUser
+                property: email
+        # used to reload user from session & other features (e.g. switch_user)
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        refresh:
+            pattern:  ^/api/token/refresh
+            stateless: true
+            anonymous: true
+        api_login:
+            pattern:  ^/api/login
+            stateless: true
+            anonymous: true
+            json_login:
+                provider: app_user_provider
+                check_path:               /api/login_check
+                username_path:            email
+                password_path:            password
+                success_handler:          lexik_jwt_authentication.handler.authentication_success
+                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+        api_v1_user_auth:
+            pattern: ^/api/v1/users/auth
+            stateless: true
+            anonymous: true
+        api_v1_user_create:
+            pattern: ^/api/v1/users/registration
+            stateless: true
+            anonymous: true
+        api_v1_auth_facebook:
+            pattern: ^/api/v1/auth/facebook
+            stateless: true
+            anonymous: true
+        api_v1_auth_google:
+            pattern: ^/api/v1/auth/google
+            stateless: true
+            anonymous: true
+        api_v1_recovery_password_phone:
+            pattern: ^/api/v1/recovery/password/phone
+            stateless: true
+            anonymous: true
+        api_v1_countries:
+            pattern: ^/api/v1/countries
+            stateless: true
+            anonymous: true
+        api:
+            pattern: ^/api/
+            stateless: true
+            anonymous: true
+            provider: app_user_provider
+            guard:
+                authenticators:
+                    - lexik_jwt_authentication.jwt_token_authenticator
+        admin:
+            pattern:  ^/admin
+            anonymous: true
+            provider: app_admin_user_provider
+            guard:
+                authenticators:
+                    - App\Security\AppAdminAuthenticator
+            logout:
+                path: admin_logout
+                # where to redirect after logout
+                target: easyadmin
+        main:
+            pattern:  ^/
+            anonymous: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        # BEGIN Api area
+        # Api anon
+        - { path: ^/api/doc, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/token/refresh, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/user/auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/auth, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/recovery, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/user/registration, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/countries, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        # Api full
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        # END Api area
+        # BEGIN Admin area
+        - { path: ^/admin/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # END Admin area

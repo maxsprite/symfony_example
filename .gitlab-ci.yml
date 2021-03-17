@@ -1,0 +1,23 @@
+image: ubuntu
+before_script:
+  - echo "Before script"
+#testing:
+#  stage: test
+#  script:
+#    - php bin/phpunit
+deploying:
+  stage: deploy
+  script:
+    - echo "Deployed"
+    - cd /var/www/hire
+    - git reset --hard
+    - git pull origin master
+    - composer install
+    - php bin/console doctrine:schema:update --force
+    - php bin/console cache:clear
+    - sudo chown -R deployer:www-data /var/www/hire
+    - find /var/www/hire -type f -exec chmod 664 {} \;
+    - find /var/www/hire -type d -exec chmod 775 {} \;
+    - sudo chmod -R 777 var/cache
+    - sudo service php7.3-fpm restart
+    - sudo service nginx restart

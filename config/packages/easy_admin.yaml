@@ -1,0 +1,105 @@
+easy_admin:
+   site_name: 'HIRE'
+   design:
+     menu:
+       - { label: 'Admin area' }
+       - { entity: AdminUser, label: 'Admin users', icon: 'user' }
+       - { entity: Company, label: 'Companies', icon: 'building' }
+       - { label: 'Users' }
+       - label: 'User'
+         children:
+           - { entity: User, label: 'List', icon: 'list' }
+           - { entity: Image, label: 'Images', icon: 'image' }
+           - { entity: Video, label: 'Videos', icon: 'video' }
+       - { entity: Consultant, icon: 'user-tie' }
+       - { entity: Country, icon: 'globe-americas' }
+       - { label: 'Request calls' }
+       - { entity: RequestCall, label: 'Request', icon: 'calendar-day' }
+       - { entity: RequestTransaction, label: 'Transaction', icon: 'list-alt' }
+   entities:
+      AdminUser:
+        class: App\Entity\AdminUser
+      RequestCall:
+        class: App\Entity\RequestCall
+      RequestTransaction:
+        class: App\Entity\RequestTransaction
+      Country:
+        class: App\Entity\Country
+      Consultant:
+        class: App\Entity\Consultant
+        list:
+          fields:
+            - { property: user.email, label: User }
+            - company
+            - price
+      Company:
+        class: App\Entity\Company
+        list:
+          fields:
+            - id
+            - name
+            - consultants
+      User:
+        class: App\Entity\User
+        list:
+#            form_filters:
+#              - country
+            fields:
+              - id
+              - { property: 'avatarFileName', type: 'image', base_path: '%app.path.user_avatar_image%' }
+#              - { property: 'avatar', type: 'image', base_path: '%app.path.user_avatar_image%' }
+              - country
+              - isActive
+              - isConfirmed
+              - email
+              - { property: consultant, type: boolean, sortable: false }
+        form:
+            fields:
+                - { type: group, label: 'Avatar', columns: 6 }
+                - { property: 'avatarFile', type: 'vich_image' }
+                - { type: group, label: 'System info', columns: 6 }
+                - isActive
+                - isConfirmed
+                - { type: group, label: 'Contacts', columns: 6, icon: user }
+                - firstName
+                - lastName
+                - phone
+                - { type: group, label: 'Main information', columns: 6, icon: user }
+                - country
+                - email
+                - password
+                - { type: group, label: 'Images', columns: 12, icon: image }
+                - { property: images, label: '', type: embedded_list }
+#        edit:
+#            fields:
+#                - { type: group, label: Consultant, css_class: 'col-sm-12', icon: calendar }
+#                - { property: consultant, label: '', type: embedded_list }
+      Image:
+        class: App\Entity\User\Image
+        list:
+          fields:
+            - id
+            - { property: 'fileName', type: 'image', base_path: '%app.path.user_image_gallery%' }
+            - user
+            - createdAt
+            - updatedAt
+        form:
+          fields:
+            - user
+            - { property: 'file', type: 'vich_image', base_path: '%app.path.user_image_gallery%' }
+
+      Video:
+        class: App\Entity\User\Video
+        list:
+          fields:
+            - id
+            - { property: 'thumbnailFileName', type: 'image', base_path: '%app.path.user_video_thumbnail%' }
+#            - { property: 'fileName', type: 'file', base_path: '%app.path.user_video_gallery%' }
+            - user
+            - createdAt
+            - updatedAt
+        form:
+          fields:
+            - user
+            - { property: 'thumbnailFile', type: 'vich_image', base_path: '%app.path.user_video_thumbnail%' }
+            - { property: 'file', type: 'vich_file', base_path: '%app.path.user_video_gallery%' }

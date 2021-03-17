@@ -1,0 +1,8 @@
+gesdinet_jwt_refresh_token:
+    ttl: 2592000
+    user_provider: security.user.provider.concrete.app_user_provider
+    user_identity_field: email
+    token_parameter_name: refresh_token
+    ttl_update: true
+    firewall: api
+    # single_use: true
